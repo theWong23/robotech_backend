@@ -7,6 +7,7 @@ import com.robotech.robotech_backend.repository.JuezRepository;
 import com.robotech.robotech_backend.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -18,6 +19,7 @@ public class AdminJuezService {
 
     private final JuezRepository juezRepository;
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     // ---------------------------------------------------------
     // CREAR JUEZ
@@ -27,7 +29,7 @@ public class AdminJuezService {
         Usuario u = Usuario.builder()
                 .correo(dto.getCorreo())
                 .telefono(dto.getTelefono())
-                .contrasenaHash(dto.getContrasena())
+                .contrasenaHash(passwordEncoder.encode(dto.getContrasena()))
                 .rol("JUEZ")
                 .estado("ACTIVO")
                 .build();
@@ -65,7 +67,7 @@ public class AdminJuezService {
         u.setTelefono(dto.getTelefono());
 
         if (dto.getContrasena() != null && !dto.getContrasena().isBlank()) {
-            u.setContrasenaHash(dto.getContrasena());
+            u.setContrasenaHash(passwordEncoder.encode(dto.getContrasena()));
         }
 
         usuarioRepository.save(u);
