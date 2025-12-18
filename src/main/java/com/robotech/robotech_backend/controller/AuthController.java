@@ -8,10 +8,9 @@ import com.robotech.robotech_backend.model.*;
 import com.robotech.robotech_backend.repository.*;
 import com.robotech.robotech_backend.service.AuthService;
 import com.robotech.robotech_backend.service.CodigoRegistroService;
-import com.robotech.robotech_backend.service.CompetidorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -22,24 +21,13 @@ import java.util.Map;
 @CrossOrigin("*")
 public class AuthController {
 
-    @Autowired
-    private CompetidorRepository competidorRepo;
-
-    @Autowired
-    private ClubRepository clubRepo;
-
-    @Autowired
-    private CodigoRegistroCompetidorRepository codigoRepo;
-
-    @Autowired
-    private UsuarioRepository usuarioRepo;
-
     private final UsuarioRepository usuarioRepository;
     private final ClubRepository clubRepository;
     private final CodigoRegistroService codigoService;
     private final CompetidorRepository competidorRepository;
     private final JuezRepository juezRepository;
     private final AuthService authService;
+    private final PasswordEncoder passwordEncoder;
 
 
     // -------------------------------------------------------
@@ -85,7 +73,7 @@ public class AuthController {
         Usuario usuario = Usuario.builder()
                 .correo(dto.getCorreo())
                 .telefono(dto.getTelefono())
-                .contrasenaHash(dto.getContrasena())
+                .contrasenaHash(passwordEncoder.encode(dto.getContrasena()))
                 .rol("COMPETIDOR")
                 .estado("PENDIENTE")
                 .build();
@@ -125,7 +113,7 @@ public class AuthController {
         Usuario usuario = Usuario.builder()
                 .correo(dto.getCorreo())
                 .telefono(dto.getTelefono())
-                .contrasenaHash(dto.getContrasena())
+                .contrasenaHash(passwordEncoder.encode(dto.getContrasena()))
                 .rol("CLUB")
                 .estado("PENDIENTE")
                 .build();
@@ -164,7 +152,7 @@ public class AuthController {
         Usuario usuario = Usuario.builder()
                 .correo(dto.getCorreo())
                 .telefono(dto.getTelefono())
-                .contrasenaHash(dto.getContrasena())
+                .contrasenaHash(passwordEncoder.encode(dto.getContrasena()))
                 .rol("JUEZ")
                 .estado("PENDIENTE")
                 .build();
