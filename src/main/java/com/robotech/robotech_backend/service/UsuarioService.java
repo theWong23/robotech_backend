@@ -2,16 +2,18 @@ package com.robotech.robotech_backend.service;
 
 import com.robotech.robotech_backend.model.Usuario;
 import com.robotech.robotech_backend.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
@@ -22,6 +24,7 @@ public class UsuarioService {
     }
 
     public Usuario crearUsuario(Usuario usuario) {
+        usuario.setContrasenaHash(passwordEncoder.encode(usuario.getContrasenaHash()));
         return usuarioRepository.save(usuario);
     }
 
@@ -35,14 +38,15 @@ public class UsuarioService {
     }
 
     public Optional<Usuario> login(String correo, String contrasena) {
-        return usuarioRepository.findByCorreoAndContrasenaHash(correo, contrasena);
+        return usuarioRepository.findByCorreo(correo)
+                .filter(usuario -> passwordEncoder.matches(contrasena, usuario.getContrasenaHash()));
     }
 
     public Optional<Usuario> actualizarUsuario(String id, Usuario datos) {
         return usuarioRepository.findById(id).map(u -> {
             u.setCorreo(datos.getCorreo());
             u.setTelefono(datos.getTelefono());
-            u.setContrasenaHash(datos.getContrasenaHash());
+            u.setContrasenaHash(passwordEncoder.encode(datos.getContrasenaHash()));
             u.setRol(datos.getRol());
             u.setEstado(datos.getEstado());
             return usuarioRepository.save(u);
