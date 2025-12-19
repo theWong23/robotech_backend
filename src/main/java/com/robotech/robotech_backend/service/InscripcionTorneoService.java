@@ -1,7 +1,10 @@
 package com.robotech.robotech_backend.service;
 
 import com.robotech.robotech_backend.model.*;
-import com.robotech.robotech_backend.repository.*;
+import com.robotech.robotech_backend.repository.CategoriaTorneoRepository;
+import com.robotech.robotech_backend.repository.CompetidorRepository;
+import com.robotech.robotech_backend.repository.InscripcionTorneoRepository;
+import com.robotech.robotech_backend.repository.RobotRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +17,14 @@ import java.util.stream.Collectors;
 public class InscripcionTorneoService {
 
     private final CategoriaTorneoRepository catRepo;
-    private final TorneoRepository torneoRepo;
     private final RobotRepository robotRepo;
     private final InscripcionTorneoRepository inscripcionRepository;
+    private final CompetidorRepository competidorRepository;
 
     // ----------------------------------------------------------------------
     // INSCRIBIR UN ROBOT A UNA CATEGORÍA DE TORNEO
     // ----------------------------------------------------------------------
-    public InscripcionTorneo inscribir(String idCategoriaTorneo, String idRobot) {
+    public InscripcionTorneo inscribir(String idCategoriaTorneo, String idRobot, String idUsuario) {
 
         CategoriaTorneo categoria = catRepo.findById(idCategoriaTorneo)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
@@ -38,8 +41,15 @@ public class InscripcionTorneoService {
             throw new RuntimeException("Las inscripciones están fuera de fecha");
         }
 
+        Competidor competidor = competidorRepository.findByUsuario_IdUsuario(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Competidor no encontrado"));
+
         Robot robot = robotRepo.findById(idRobot)
                 .orElseThrow(() -> new RuntimeException("Robot no encontrado"));
+
+        if (!robot.getCompetidor().equals(competidor)) {
+            throw new RuntimeException("El robot no pertenece al competidor");
+        }
 
         // No duplicar inscripción
         boolean yaInscrito = inscripcionRepository
