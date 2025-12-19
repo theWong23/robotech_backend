@@ -1,12 +1,13 @@
 package com.robotech.robotech_backend.service;
 
-import com.robotech.robotech_backend.model.Torneo;
 import com.robotech.robotech_backend.model.CategoriaTorneo;
+import com.robotech.robotech_backend.model.Torneo;
+import com.robotech.robotech_backend.model.Usuario;
 import com.robotech.robotech_backend.repository.TorneoRepository;
 import com.robotech.robotech_backend.repository.CategoriaTorneoRepository;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
 
 import java.util.*;
 
@@ -45,6 +46,8 @@ public class TorneoService {
         t.setFechaAperturaInscripcion(datos.getFechaAperturaInscripcion());
         t.setFechaCierreInscripcion(datos.getFechaCierreInscripcion());
         t.setTipo(datos.getTipo());
+        t.setMaxParticipantes(datos.getMaxParticipantes());
+        t.setNumeroEncuentros(datos.getNumeroEncuentros());
 
         return torneoRepo.save(t);
     }
@@ -104,7 +107,7 @@ public class TorneoService {
     }
 
     public List<Torneo> listarParaClub() {
-        return torneoRepo.findByEstado("INSCRIPCIONES_ABIERTAS");
+        return torneoRepo.findByEstadoAndTipo("INSCRIPCIONES_ABIERTAS", "EQUIPOS");
     }
 
     public List<Torneo> listarPublicos() {
@@ -114,8 +117,9 @@ public class TorneoService {
     }
 
     public List<Torneo> listarParaCompetidor() {
-        return torneoRepo.findByEstadoIn(
-                List.of("INSCRIPCIONES_ABIERTAS", "EN_PROGRESO")
+        return torneoRepo.findByEstadoInAndTipo(
+                List.of("INSCRIPCIONES_ABIERTAS", "EN_PROGRESO"),
+                "INDIVIDUAL"
         );
     }
 
@@ -124,8 +128,15 @@ public class TorneoService {
         return categoriaRepo.findByTorneo(torneo);
     }
     public List<Torneo> listarParaClub(Authentication auth) {
-        // por ahora solo filtramos por estado
-        return torneoRepo.findByEstado("INSCRIPCIONES_ABIERTAS");}
+        return torneoRepo.findByEstadoAndTipo("INSCRIPCIONES_ABIERTAS", "EQUIPOS");
+    }
+
+    public List<Torneo> listarPorAdministrador(Authentication auth) {
+        if (auth == null || !(auth.getPrincipal() instanceof Usuario usuario)) {
+            return torneoRepo.findAll();
+        }
+        return torneoRepo.findByCreadoPor(usuario.getIdUsuario());
+    }
 
 
 
