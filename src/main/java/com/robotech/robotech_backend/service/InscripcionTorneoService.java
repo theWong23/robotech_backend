@@ -28,6 +28,10 @@ public class InscripcionTorneoService {
 
         Torneo torneo = categoria.getTorneo();
 
+        if (!"INDIVIDUAL".equals(torneo.getTipo())) {
+            throw new RuntimeException("Este torneo no es individual");
+        }
+
         Date hoy = new Date();
         if (hoy.before(torneo.getFechaAperturaInscripcion()) ||
                 hoy.after(torneo.getFechaCierreInscripcion())) {

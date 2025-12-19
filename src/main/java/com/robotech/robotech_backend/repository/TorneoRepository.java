@@ -12,4 +12,10 @@ public interface TorneoRepository extends JpaRepository<Torneo, String> {
 
     List<Torneo> findByEstadoIn(List<String> estados);
 
+    List<Torneo> findByEstadoAndTipo(String estado, String tipo);
+
+    List<Torneo> findByEstadoInAndTipo(List<String> estados, String tipo);
+
+    List<Torneo> findByCreadoPor(String creadoPor);
+
 }

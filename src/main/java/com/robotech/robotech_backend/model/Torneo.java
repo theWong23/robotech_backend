@@ -44,6 +44,15 @@ public class Torneo {
     @Column(nullable = false)
     private String estado; // BORRADOR, INSCRIPCIONES_ABIERTAS, EN_PROGRESO, FINALIZADO
 
+    @Column
+    private Integer maxParticipantes;
+
+    @Column
+    private Integer numeroEncuentros;
+
+    @Column
+    private String creadoPor;
+
     @OneToMany(mappedBy = "torneo")
     @JsonManagedReference
     private List<CategoriaTorneo> categorias;
