@@ -4,6 +4,8 @@ import com.robotech.robotech_backend.dto.InscripcionDTO;
 import com.robotech.robotech_backend.service.InscripcionTorneoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +18,17 @@ public class InscripcionController {
 
     // Competidor se inscribe a un torneo
     @PostMapping("/{id}/inscribir")
+    @PreAuthorize("hasAuthority('COMPETIDOR')")
     public ResponseEntity<?> inscribir(
             @PathVariable String id,                // idCategoriaTorneo
-            @RequestBody InscripcionDTO dto        // contiene idRobot
+            @RequestBody InscripcionDTO dto,
+            Authentication auth
     ) {
+        if (auth == null || !(auth.getPrincipal() instanceof com.robotech.robotech_backend.model.Usuario usuario)) {
+            return ResponseEntity.status(401).body("No autenticado");
+        }
         return ResponseEntity.ok(
-                inscripcionService.inscribir(id, dto.getIdRobot())
+                inscripcionService.inscribir(id, dto.getIdRobot(), usuario.getIdUsuario())
         );
     }
 
