@@ -8,9 +8,15 @@ import com.robotech.robotech_backend.repository.RobotRepository;
 import com.robotech.robotech_backend.repository.TorneoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -76,9 +82,38 @@ public class CompetidorService {
                 // TEMPORAL
                 .totalTorneos(0)
                 .puntosRanking(0)
-                .fotoUrl(null)
+
+                // FOTO
+                .fotoUrl(c.getFotoUrl())
 
                 .build();
     }
 
+    // =============================
+    // FOTO DE PERFIL
+    // =============================
+
+    public String subirFoto(String idCompetidor, MultipartFile foto) {
+
+        try {
+            Competidor c = competidorRepo.findById(idCompetidor)
+                    .orElseThrow(() -> new RuntimeException("Competidor no encontrado"));
+
+            File carpeta = new File("uploads/competidores");
+            if (!carpeta.exists()) carpeta.mkdirs();
+
+            String nombreArchivo = UUID.randomUUID() + "_" + foto.getOriginalFilename();
+            Path ruta = Paths.get("uploads/competidores/" + nombreArchivo);
+
+            Files.write(ruta, foto.getBytes());
+
+            c.setFotoUrl("/uploads/competidores/" + nombreArchivo);
+            competidorRepo.save(c);
+
+            return c.getFotoUrl();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al subir la foto");
+        }
+    }
 }
