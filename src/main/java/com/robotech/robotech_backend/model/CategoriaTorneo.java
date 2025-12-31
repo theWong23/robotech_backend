@@ -1,12 +1,8 @@
 package com.robotech.robotech_backend.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "categorias_torneo")
@@ -20,16 +16,17 @@ public class CategoriaTorneo {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String idCategoriaTorneo;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_torneo", nullable = false)
+    @JsonIgnore // 🔥 CLAVE: corta el bucle infinito
     private Torneo torneo;
 
     @Column(nullable = false)
-    private String categoria; // Minisumo, Sumo, etc.
+    private String categoria;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ModalidadCategoria modalidad; // INDIVIDUAL | EQUIPO
+    private ModalidadCategoria modalidad;
 
     // Para INDIVIDUAL
     private Integer maxParticipantes;

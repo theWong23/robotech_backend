@@ -15,4 +15,5 @@ public interface TorneoRepository extends JpaRepository<Torneo, String> {
 
     // Torneos creados por un usuario (admin / subadmin)
     List<Torneo> findByCreadoPor(String creadoPor);
+
 }

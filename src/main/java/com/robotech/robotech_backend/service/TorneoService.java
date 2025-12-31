@@ -1,5 +1,6 @@
 package com.robotech.robotech_backend.service;
 
+import com.robotech.robotech_backend.dto.CrearTorneoDTO;
 import com.robotech.robotech_backend.model.CategoriaTorneo;
 import com.robotech.robotech_backend.model.Torneo;
 import com.robotech.robotech_backend.model.Usuario;
@@ -22,16 +23,40 @@ public class TorneoService {
     // --------------------------------------------------
     // CREAR TORNEO
     // --------------------------------------------------
-    public Torneo crearTorneo(Torneo t) {
+    public Torneo crearTorneo(CrearTorneoDTO dto, Authentication auth) {
+
+        Torneo t = Torneo.builder()
+                .nombre(dto.getNombre())
+                .descripcion(dto.getDescripcion())
+                .fechaInicio(dto.getFechaInicio())
+                .fechaFin(dto.getFechaFin())
+                .fechaAperturaInscripcion(dto.getFechaAperturaInscripcion())
+                .fechaCierreInscripcion(dto.getFechaCierreInscripcion())
+                .build();
+
+        // Reglas de negocio aquí
         t.setEstado("BORRADOR");
+
+        if (auth != null && auth.getPrincipal() instanceof Usuario usuario) {
+            t.setCreadoPor(usuario.getIdUsuario());
+        } else {
+            throw new RuntimeException("No autenticado");
+        }
+
         return torneoRepo.save(t);
     }
+
 
     // --------------------------------------------------
     // LISTAR TODOS
     // --------------------------------------------------
     public List<Torneo> listar() {
         return torneoRepo.findAll();
+    }
+
+    // TORNEOS DISPONIBLES PARA CLUBES
+    public List<Torneo> listarDisponibles() {
+        return torneoRepo.findByEstado("INSCRIPCIONES_ABIERTAS");
     }
 
     // --------------------------------------------------
@@ -41,6 +66,8 @@ public class TorneoService {
         return torneoRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Torneo no encontrado"));
     }
+
+
 
     // --------------------------------------------------
     // EDITAR TORNEO
@@ -146,6 +173,12 @@ public class TorneoService {
             return torneoRepo.findAll();
         }
 
+        if ("ADMIN".equals(usuario.getRol())) {
+            return torneoRepo.findAll();
+        }
+
         return torneoRepo.findByCreadoPor(usuario.getIdUsuario());
     }
+
+
 }

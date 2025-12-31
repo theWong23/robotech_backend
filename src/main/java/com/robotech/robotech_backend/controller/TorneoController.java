@@ -23,31 +23,17 @@ public class TorneoController {
     // Crear torneo
     @PostMapping
     public ResponseEntity<?> crear(@RequestBody CrearTorneoDTO dto, Authentication auth) {
-
-        Torneo torneo = Torneo.builder()
-                .nombre(dto.getNombre())
-                .descripcion(dto.getDescripcion())
-                .fechaInicio(dto.getFechaInicio())
-                .fechaFin(dto.getFechaFin())
-                .fechaAperturaInscripcion(dto.getFechaAperturaInscripcion())
-                .fechaCierreInscripcion(dto.getFechaCierreInscripcion())
-                .estado("BORRADOR")
-                .build();
-
-        if (auth != null && auth.getPrincipal() instanceof com.robotech.robotech_backend.model.Usuario usuario) {
-            torneo.setCreadoPor(usuario.getIdUsuario());
-        }
-
-        return ResponseEntity.ok(torneoService.crearTorneo(torneo));
+        return ResponseEntity.ok(torneoService.crearTorneo(dto, auth));
     }
-
 
 
    // Listar torneos
-    @GetMapping
-   public ResponseEntity<?> listar(Authentication auth) {
-        return ResponseEntity.ok(torneoService.listarPorAdministrador(auth));
-    }
+   @GetMapping
+   public ResponseEntity<?> listar() {
+       System.out.println("🔥 LISTANDO TODOS LOS TORNEOS");
+       return ResponseEntity.ok(torneoService.listar());
+   }
+
 
     // Editar torneo
     @PutMapping("/{id}")
