@@ -90,6 +90,8 @@ public class AuthController {
                 .estadoValidacion("PENDIENTE")
                 .build();
 
+        competidor.setClub(codigo.getClub());
+
         competidorRepository.save(competidor);
 
         // 4. Marcar código como usado

@@ -41,7 +41,8 @@ public class Competidor {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_club")
-    private Club club;
+    private Club club; // club de origen / histórico
+
 
     @OneToMany(mappedBy = "competidor")
     @JsonIgnore
