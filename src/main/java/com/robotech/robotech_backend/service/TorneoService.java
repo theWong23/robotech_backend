@@ -128,6 +128,7 @@ public class TorneoService {
         List<String> permitidos = List.of(
                 "BORRADOR",
                 "INSCRIPCIONES_ABIERTAS",
+                "INSCRIPCIONES_CERRADAS",
                 "EN_PROGRESO",
                 "FINALIZADO"
         );

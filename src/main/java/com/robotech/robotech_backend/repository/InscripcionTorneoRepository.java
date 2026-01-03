@@ -18,4 +18,5 @@ public interface InscripcionTorneoRepository extends JpaRepository<InscripcionTo
 
     // 🔹 Para vista COMPETIDOR
     List<InscripcionTorneo> findByRobotCompetidorUsuarioIdUsuario(String idUsuario);
+    List<InscripcionTorneo> findByCategoriaTorneoIdCategoriaTorneo(String idCategoriaTorneo);
 }

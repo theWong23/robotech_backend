@@ -28,4 +28,7 @@ public interface EquipoTorneoRepository
 
     // 🔹 Vista COMPETIDOR
     List<EquipoTorneo> findByRobotsCompetidorUsuarioIdUsuario(String idUsuario);
+
+    List<EquipoTorneo> findByCategoriaTorneoIdCategoriaTorneo(String idCategoriaTorneo);
+
 }
