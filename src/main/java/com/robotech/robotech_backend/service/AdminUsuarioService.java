@@ -13,8 +13,10 @@ import com.robotech.robotech_backend.service.validadores.TelefonoValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Set;
 
@@ -74,12 +76,26 @@ public class AdminUsuarioService {
         }
 
         if (usuarioRepo.existsByCorreo(dto.correo())) {
-            throw new RuntimeException("El correo ya está registrado");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El correo ya está registrado"
+            );
         }
 
         if (usuarioRepo.existsByTelefono(dto.telefono())) {
-            throw new RuntimeException("El teléfono ya está registrado");
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El teléfono ya está registrado"
+            );
         }
+
+        if (usuarioRepo.existsByDni(dto.dni())) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "El DNI ya está registrado"
+            );
+        }
+
 
 
         Usuario u = Usuario.builder()

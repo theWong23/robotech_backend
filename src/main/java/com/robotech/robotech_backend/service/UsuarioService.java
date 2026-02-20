@@ -88,9 +88,9 @@ public class UsuarioService {
                 .correo(dto.correo())
                 .telefono(dto.telefono())
                 .contrasenaHash(passwordEncoder.encode(dto.contrasena()))
-                // ⚠️ CORRECCIÓN: Usar el Enum RolUsuario.COMPETIDOR, no un String ni ADMINISTRADOR
+                // CORRECCIÓN: Usar el Enum RolUsuario.COMPETIDOR, no un String ni ADMINISTRADOR
                 .roles(Set.of(RolUsuario.COMPETIDOR))
-                // ⚠️ CORRECCIÓN: Dejar solo un estado (ACTIVO para que pueda loguearse)
+                // CORRECCIÓN: Dejar solo un estado (ACTIVO para que pueda loguearse)
                 .estado(EstadoUsuario.ACTIVO)
                 .build();
 
