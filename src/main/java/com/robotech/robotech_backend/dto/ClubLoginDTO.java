@@ -4,7 +4,8 @@ public record ClubLoginDTO(
         String idClub,
         String nombre,
         String correoContacto,
-        String telefonoContacto
+        String telefonoContacto,
+        String imagenUrl
 ) {}
 
 

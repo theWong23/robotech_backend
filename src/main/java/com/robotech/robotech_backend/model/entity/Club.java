@@ -30,6 +30,8 @@ public class Club {
     private String correoContacto;
     private String telefonoContacto;
     private String direccionFiscal;
+    @Column(name = "imagen_url")
+    private String imagenUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

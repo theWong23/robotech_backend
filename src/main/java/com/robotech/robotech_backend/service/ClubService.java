@@ -4,9 +4,15 @@ import com.robotech.robotech_backend.model.entity.*;
 import com.robotech.robotech_backend.model.enums.*;
 import com.robotech.robotech_backend.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 @Service
@@ -16,8 +22,10 @@ public class ClubService {
     private final ClubRepository clubRepository;
     private final UsuarioRepository usuarioRepository;
     private final RobotRepository robotRepository;
-    // ✅ Añadimos el repositorio con el nombre exacto que proporcionaste
     private final CodigoRegistroCompetidorRepository codigoRegistroCompetidorRepository;
+
+    @Value("${app.uploads.dir:uploads}")
+    private String uploadsDir;
 
     public List<Club> listar() {
         return clubRepository.findAll();
@@ -44,26 +52,39 @@ public class ClubService {
                 .orElseThrow(() -> new RuntimeException("Club no asociado al usuario"));
     }
 
-    // =============================================================
-    // 📊 LÓGICA DE ESTADÍSTICAS PARA EL DASHBOARD
-    // =============================================================
+    public String subirImagenClub(Authentication auth, MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("Debes seleccionar una imagen");
+        }
 
-    /**
-     * ✅ Genera un mapa con los conteos calculados en el servidor
-     */
+        Club club = obtenerPorUsuario(auth);
+
+        try {
+            String nombreOriginal = file.getOriginalFilename() != null ? file.getOriginalFilename() : "imagen.jpg";
+            String nombreArchivo = UUID.randomUUID() + "_" + nombreOriginal;
+            Path ruta = Paths.get(uploadsDir, "clubes", nombreArchivo);
+
+            Files.createDirectories(ruta.getParent());
+            Files.write(ruta, file.getBytes());
+
+            String imagenUrl = "/uploads/clubes/" + nombreArchivo;
+            club.setImagenUrl(imagenUrl);
+            clubRepository.save(club);
+            return imagenUrl;
+        } catch (IOException e) {
+            throw new RuntimeException("Error al subir la imagen del club");
+        }
+    }
+
     public Map<String, Long> obtenerEstadisticasDashboard(String idClub) {
         Map<String, Long> stats = new HashMap<>();
 
-        // Conteo de competidores y robots usando tus métodos personalizados
         stats.put("totalCompetidores", usuarioRepository.contarUsuariosPorClub(idClub));
         stats.put("totalRobots", robotRepository.contarRobotsPorClub(idClub));
 
-        // ✅ Uso del repositorio inyectado para obtener el total de códigos
-        // Usamos el método countByClubIdClub que definimos para el repositorio
         long total = codigoRegistroCompetidorRepository.countByClubIdClub(idClub);
         stats.put("totalCodigos", total);
 
         return stats;
     }
 }
-

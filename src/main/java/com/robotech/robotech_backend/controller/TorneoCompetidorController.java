@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/competidor/torneos")
-@PreAuthorize("hasAuthority('COMPETIDOR')")
 public class TorneoCompetidorController {
 
     private final TorneoService torneoService;
@@ -22,6 +21,7 @@ public class TorneoCompetidorController {
     // LISTAR MIS TORNEOS (COMPETIDOR)
     // --------------------------------------------------
     @GetMapping("/mis")
+    @PreAuthorize("hasAuthority('COMPETIDOR')")
     public ResponseEntity<?> listarMis(Authentication auth) {
         Usuario usuario = (Usuario) auth.getPrincipal();
         return ResponseEntity.ok(
@@ -33,6 +33,7 @@ public class TorneoCompetidorController {
     // LISTAR TORNEOS DISPONIBLES PARA COMPETIDOR
     // --------------------------------------------------
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('COMPETIDOR','CLUB')")
     public ResponseEntity<?> listar() {
         return ResponseEntity.ok(
                 torneoService.listarPublicos()
@@ -43,6 +44,7 @@ public class TorneoCompetidorController {
     // LISTAR CATEGORÍAS DE UN TORNEO
     // --------------------------------------------------
     @GetMapping("/{id}/categorias")
+    @PreAuthorize("hasAnyAuthority('COMPETIDOR','CLUB')")
     public ResponseEntity<?> categorias(@PathVariable String id) {
         return ResponseEntity.ok(
                 torneoService.listarCategorias(id)

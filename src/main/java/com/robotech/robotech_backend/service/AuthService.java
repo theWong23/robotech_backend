@@ -91,7 +91,8 @@ public class AuthService {
                     club.getIdClub(),
                     club.getNombre(),
                     club.getCorreoContacto(),
-                    club.getTelefonoContacto()
+                    club.getTelefonoContacto(),
+                    club.getImagenUrl()
             ));
         }
 
